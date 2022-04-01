@@ -88,7 +88,7 @@ public class AdmobRecyclerAdapterWrapper
         return adFetcher.getFetchingAdsCount();
     }
 
-    private int getViewTypeAd(){
+    public int getViewTypeAd(){
         return getViewTypeBiggestSource() + VIEW_TYPE_AD + 1;
     }
 

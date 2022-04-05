@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.nativead.MediaView;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
 
@@ -33,46 +34,50 @@ public class AdLayoutContext extends NativeAdLayoutContext{
     }
 
     @Override
-    public void bind(NativeAdView nativeAdView, NativeAd nativeAd) throws ClassCastException{
-        if (nativeAdView == null || nativeAd == null) return;
+    public void bind(NativeAdView adView, NativeAd nativeAd) throws ClassCastException{
+        if (adView == null || nativeAd == null) return;
 
         // Locate the view that will hold the headline, set its text, and call the
         // NativeAppInstallAdView's setHeadlineView method to register it.
-        TextView tvHeader = nativeAdView.findViewById(R.id.tvHeader);
-        tvHeader.setText(nativeAd.getHeadline());
-        nativeAdView.setHeadlineView(tvHeader);
 
-        TextView tvDescription = nativeAdView.findViewById(R.id.tvDescription);
-        tvDescription.setText(nativeAd.getBody());
-        nativeAdView.setBodyView(tvDescription);
+        // Set the media view.
+        adView.setMediaView((MediaView) adView.findViewById(R.id.ad_media));
+        // Set other ad assets.
+        adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
+        adView.setBodyView(adView.findViewById(R.id.ad_body));
+        adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
+        adView.setIconView(adView.findViewById(R.id.ad_app_icon));
+        adView.setPriceView(adView.findViewById(R.id.ad_price));
+        adView.setStoreView(adView.findViewById(R.id.ad_store));
 
-        ImageView ivLogo = nativeAdView.findViewById(R.id.ivLogo);
-        if(nativeAd.getIcon()!=null)
-            ivLogo.setImageDrawable(nativeAd.getIcon().getDrawable());
-        nativeAdView.setIconView(ivLogo);
+        // The headline (title) and mediaContent are guaranteed to be in every NativeAd.
+        ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
+        adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
 
-        Button btnAction = nativeAdView.findViewById(R.id.btnAction);
-        btnAction.setText(nativeAd.getCallToAction());
-        nativeAdView.setCallToActionView(btnAction);
+        if (nativeAd.getBody() == null) {
+            adView.getBodyView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getBodyView().setVisibility(View.VISIBLE);
+            ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
+        }
 
-        TextView tvStore = nativeAdView.findViewById(R.id.tvStore);
-        tvStore.setText(nativeAd.getStore());
-        nativeAdView.setStoreView(tvStore);
+        if (nativeAd.getCallToAction() == null) {
+            adView.getCallToActionView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getCallToActionView().setVisibility(View.VISIBLE);
+            ((Button) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        }
 
-        TextView tvPrice = nativeAdView.findViewById(R.id.tvPrice);
-        tvPrice.setText(nativeAd.getPrice());
-        nativeAdView.setPriceView(tvPrice);
-
-        ImageView ivImage = nativeAdView.findViewById(R.id.ivImage);
-        nativeAd.getImages();
-        if (nativeAd.getImages().size() > 0) {
-            ivImage.setImageDrawable(nativeAd.getImages().get(0).getDrawable());
-            ivImage.setVisibility(View.VISIBLE);
-        } else ivImage.setVisibility(View.GONE);
-        nativeAdView.setImageView(ivImage);
+        if (nativeAd.getIcon() == null) {
+            adView.getIconView().setVisibility(View.GONE);
+        } else {
+            ((ImageView) adView.getIconView()).setImageDrawable(
+                    nativeAd.getIcon().getDrawable());
+            adView.getIconView().setVisibility(View.VISIBLE);
+        }
 
         // Call the NativeAppInstallAdView's setNativeAd method to register the NativeAd.
-        nativeAdView.setNativeAd(nativeAd);
+        adView.setNativeAd(nativeAd);
     }
 
 }

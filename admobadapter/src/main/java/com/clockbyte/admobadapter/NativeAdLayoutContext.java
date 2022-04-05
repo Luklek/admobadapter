@@ -43,7 +43,7 @@ public abstract class NativeAdLayoutContext {
         this.mAdLayoutId = mAdLayoutId;
     }
 
-    public abstract void bind(NativeAdView nativeAdView, NativeAd nativeAd);
+    public abstract void bind(NativeAdView adView, NativeAd nativeAd);
 
     public NativeAdView inflateView(ViewGroup root) throws IllegalArgumentException{
         if(root == null) throw new IllegalArgumentException("root should be not null");
